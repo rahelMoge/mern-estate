@@ -9,36 +9,32 @@ dotenv.config();
 
 const app = express();
 
-/* =========================
-   MIDDLEWARE
-========================= */
-
-// Allows Express to read JSON from Insomnia/Postman
+// Middleware
 app.use(express.json());
 
-/* =========================
-   DATABASE CONNECTION
-========================= */
-
+// MongoDB connection
 mongoose
   .connect(process.env.MONGO)
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error);
-  });
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => console.error('MongoDB connection error:', error));
 
-/* =========================
-   ROUTES
-========================= */
-
-// Test route (optional b
-// ... existing code ...
-
+// Routes
 app.use('/api/user', userRouter);
-app.use('/api/auth', authRouter); // This defines the start of your URL
+app.use('/api/auth', authRouter);
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+
+  res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message,
+  });
+});
+
+// Start server
 app.listen(5000, () => {
-    console.log('Server is running on port 5000');
+  console.log('Server running on port 5000');
 });
