@@ -10,37 +10,37 @@ export default function SignUp() {
   const handleChange = (e) => {
     setFormData(
       {
-      ...formData,
-      [e.target.id]: e.target.value,
+      ...formData,  // keep existing form data
+      [e.target.id]: e.target.value, // update the changed input field by its id
       }); 
   };
   const  handleSubmit =  async (e) => {
-    e.preventDefault();
+    e.preventDefault();  // stop the page from refreshing when the form submits
     try {
-    setLoading(true);
+    setLoading(true); // show loading state
     const res = await fetch('/api/auth/signup',
       { 
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json' // telling server data is JSON
         },
         body: JSON.stringify(formData),
       });
 
-     const data = await res.json();
-     console.log(data);
-     if(data.success === false) {
-      setLoading(false);
-       setError(data.message);
-      return;
+     const data = await res.json(); // wait and parse JSON response from server
+     console.log(data);               // log the server response (for debugging)
+     if(data.success === false) {       // if backend responds with failure
+      setLoading(false);             // stop loading spinner
+       setError(data.message);       // show error message
+      return;             // stop further code execution
      }
-     setLoading(false);
-     setError(null);
-     navigate('/sign-in');
+     setLoading(false);     // stop loading if success
+     setError(null);             // clear previous errors
+     navigate('/sign-in');      // redirect to sign-in page after success
 
     } catch (error) {
-      setLoading(false);
-      setError(error.message);
+      setLoading(false);         // stop loading on error
+      setError(error.message);   // show error message
 
     }
   };

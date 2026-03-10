@@ -1,9 +1,11 @@
 import express from 'express';
-import { signup } from '../controllers/auth.controller.js';
+import bcrypt from 'bcrypt';
 
+import { signin, signup } from '../controllers/auth.controller.js';
 
-const route = express.Router();
+const router = express.Router();
 
-route.post("/signup", signup) 
+router.post('/signup', signup);
+router.post('/signin', signin);
 
-export default route;
+export default router;
