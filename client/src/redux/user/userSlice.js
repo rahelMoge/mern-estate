@@ -12,10 +12,14 @@ const userSlice = createSlice({
   reducers: {
     signInStart: (state) => {
       state.loading = true;
-      state.error = null; // clear previous errors
+      state.error = null;
     },
     signInSuccess: (state, action) => {
-      state.currentUser = action.payload;
+      const payload = { ...action.payload };
+      if (payload.avatar && payload.avatar.startsWith("/uploads")) {
+        payload.avatar = `http://localhost:5000${payload.avatar}`;
+      }
+      state.currentUser = payload;
       state.loading = false;
       state.error = null;
     },
@@ -23,9 +27,28 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
+
+    // <-- ADD THIS
+    updateUser: (state, action) => {
+      if (state.currentUser) {
+        const payload = { ...action.payload };
+        if (payload.avatar && payload.avatar.startsWith("/uploads")) {
+          payload.avatar = `http://localhost:5000${payload.avatar}`;
+        }
+        state.currentUser = { ...state.currentUser, ...payload };
+      }
+    },
+
+    // Optional sign out
+    signOut: (state) => {
+      state.currentUser = null;
+      state.error = null;
+      state.loading = false;
+    },
   },
 });
 
-export const { signInStart, signInSuccess, signInFailure } = userSlice.actions;
+export const { signInStart, signInSuccess, signInFailure, updateUser, signOut } =
+  userSlice.actions;
 
 export default userSlice.reducer;
