@@ -2,14 +2,15 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   currentUser: null,
-  error: null,
   loading: false,
+  error: null,
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    // --- Sign-in actions
     signInStart: (state) => {
       state.loading = true;
       state.error = null;
@@ -28,27 +29,34 @@ const userSlice = createSlice({
       state.loading = false;
     },
 
-    // <-- ADD THIS
-    updateUser: (state, action) => {
-      if (state.currentUser) {
-        const payload = { ...action.payload };
-        if (payload.avatar && payload.avatar.startsWith("/uploads")) {
-          payload.avatar = `http://localhost:5000${payload.avatar}`;
-        }
-        state.currentUser = { ...state.currentUser, ...payload };
-      }
-    },
-
-    // Optional sign out
-    signOut: (state) => {
-      state.currentUser = null;
+    // --- Update user actions
+    updateUserStart: (state) => {
+      state.loading = true;
       state.error = null;
+    },
+    updateUserSuccess: (state, action) => {
+      const user = { ...action.payload };
+      if (user.avatar && user.avatar.startsWith("/uploads")) {
+        user.avatar = `http://localhost:5000${user.avatar}`;
+      }
+      state.currentUser = user;
+      state.loading = false;
+      state.error = null;
+    },
+    updateUserFailure: (state, action) => {
+      state.error = action.payload;
       state.loading = false;
     },
   },
 });
 
-export const { signInStart, signInSuccess, signInFailure, updateUser, signOut } =
-  userSlice.actions;
+export const {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+} = userSlice.actions;
 
 export default userSlice.reducer;

@@ -37,7 +37,7 @@ export const signin = async (req, res, next) => {
     const { password: pass, ...rest } = validUser._doc; // Remove password before sending user data
 
     res
-      .cookie("access_token", token, { httpOnly: true }) // Store JWT in secure cookie
+      .cookie("access_token", token, { httpOnly: true, path: '/' }) // Store JWT in secure cookie
       .status(200)
       .json(rest); // Send user information to frontend
   } catch (error) {
@@ -58,7 +58,7 @@ export const google = async (req, res, next) => {
       const { password: pass, ...rest } = user._doc; // Remove password from response
 
       res
-        .cookie('access_token', token, { httpOnly: true }) // Save token in cookie
+        .cookie('access_token', token, { httpOnly: true, path: '/' }) // Save token in cookie
         .status(200)
         .json(rest); // Send user data
 
@@ -85,7 +85,7 @@ export const google = async (req, res, next) => {
       const { password: pass, ...rest } = newUser._doc; // Remove password before sending response
 
       res
-        .cookie('access_token', token, { httpOnly: true }) // Store token in cookie
+        .cookie('access_token', token, { httpOnly: true, path: '/' }) // Store token in cookie
         .status(200)
         .json(rest); // Send new user data
     }

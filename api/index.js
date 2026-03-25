@@ -3,20 +3,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import dns from "dns";
 import path from "path";
-import uploadRouter from "./routes/upload.route.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
-const app = express();
-
-app.use(cors());
-
-// Routes
-app.use("/api/upload", uploadRouter);
-
-
-import userRouter from "./routes/user.route.js";
-import authRouter from "./routes/auth.route.js";
 
 dotenv.config();
 
@@ -26,8 +14,13 @@ dns.setDefaultResultOrder("ipv4first");
 // Disable mongoose command buffering so DB ops fail fast when not connected
 mongoose.set("bufferCommands", false);
 
+import uploadRouter from "./routes/upload.route.js";
+import userRouter from "./routes/user.route.js";
+import authRouter from "./routes/auth.route.js";
 
-// Middleware
+const app = express();
+
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 

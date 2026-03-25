@@ -52,7 +52,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// Update user (POST method, JSON format)
-router.post("/update/:id", verifyToken, updateUser);
+// Update user (POST method, with optional avatar)
+router.post("/update/:id", verifyToken, upload.single("avatar"), updateUser);
 
 export default router;
