@@ -8,13 +8,8 @@ export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const backendUrl = "http://localhost:5000";
   const [file, setFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState(
-    currentUser.avatar?.startsWith("/uploads")
-      ? `${backendUrl}${currentUser.avatar}`
-      : currentUser.avatar
-  );
+  const [avatarPreview, setAvatarPreview] = useState(currentUser.avatar);
 
   const [formData, setFormData] = useState({
     username: currentUser.username,
@@ -48,16 +43,16 @@ export default function Profile() {
       if (formData.password) data.append("password", formData.password);
       if (file) data.append("avatar", file);
 
-      const res = await axios.put(`${backendUrl}/api/user/${currentUser._id}`, data, {
+      const res = await axios.post(`/api/user/update/${currentUser._id}`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // update redux and UI with persisted user
+      // updateUser reducer already normalises /uploads → full URL
       dispatch(updateUser(res.data));
       if (res.data.avatar) {
         setAvatarPreview(
           res.data.avatar.startsWith("/uploads")
-            ? `${backendUrl}${res.data.avatar}`
+            ? `http://localhost:5000${res.data.avatar}`
             : res.data.avatar
         );
       }

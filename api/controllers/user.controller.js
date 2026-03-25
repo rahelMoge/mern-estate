@@ -1,5 +1,41 @@
+import bcryptjs from 'bcryptjs';
+import { errorHandler } from '../utils/error.js';
+import User from "../models/user.model.js";
+
 export const test = (req, res) => {
-    res.json({
-        message: 'API route is working noww',
-    });
+  res.json({
+    message: 'API route is working noww',
+  });
 };
+export const updateUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id) return next(errorHandler(401, "you can only update your own account"))
+  try {
+    if (req.body.password) {
+      req.body.password = bcryptjs.hashSync(req.body.password, 10)
+    }
+
+    if (req.file) {
+      const filePath = req.file.path.replace(/\\/g, "/").replace("api/", "/");
+      req.body.avatar = filePath;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          ...(req.body.username && { username: req.body.username }),
+          ...(req.body.email && { email: req.body.email }),
+          ...(req.body.password && { password: req.body.password }),
+          ...(req.body.avatar && { avatar: req.body.avatar }),
+        },
+      },
+      { new: true }
+    );
+
+    const { password, ...rest } = updatedUser._doc;
+    res.status(200).json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
+

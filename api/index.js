@@ -5,6 +5,7 @@ import dns from "dns";
 import path from "path";
 import uploadRouter from "./routes/upload.route.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -28,6 +29,7 @@ mongoose.set("bufferCommands", false);
 
 // Middleware
 app.use(express.json());
+app.use(cookieParser());
 
 // Serve uploaded images
 app.use("/uploads", express.static(path.join(process.cwd(), "api/uploads")));
