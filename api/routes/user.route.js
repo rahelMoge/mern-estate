@@ -1,13 +1,14 @@
 import express from "express";
 import { upload } from "../utils/multer.js";
 import User from "../models/user.model.js";
-import { test, updateUser } from "../controllers/user.controller.js";
+import { deleteUser, test, updateUser } from "../controllers/user.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
 
 const router = express.Router();
 
 // Test route
 router.get("/test", test);
+router.delete("/delete/:id", verifyToken, deleteUser)
 
 // Upload profile image
 router.post("/uploadProfile", upload.single("profileImage"), async (req, res, next) => {
