@@ -17,6 +17,7 @@ mongoose.set("bufferCommands", false);
 import uploadRouter from "./routes/upload.route.js";
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
+import listingRouter from "./routes/listing.route.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "api/uploads")));
 // Routes
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
