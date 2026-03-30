@@ -30,6 +30,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "api/uploads")));
 
 
 // Routes
+app.use("/api/upload", uploadRouter);
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
