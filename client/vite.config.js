@@ -4,8 +4,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
    server: {
     proxy: {
-      '/api' : {
-        target: 'http://localhost:5000', // forward /api requests to backend
+      '/api': {
+        target: 'http://localhost:5000',
+        secure: false,
+      },
+      '/uploads': {
+        target: 'http://localhost:5000',
         secure: false,
       },
     },
