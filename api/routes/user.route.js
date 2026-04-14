@@ -3,17 +3,20 @@ import { upload } from "../utils/multer.js";
 import User from "../models/user.model.js";
 import { deleteUser, test, updateUser } from "../controllers/user.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
+import listingController from "../controllers/listing.controller.js"; // default export
 
 const router = express.Router();
 
 // Test route
 router.get("/test", test);
-router.delete("/delete/:id", verifyToken, deleteUser)
+
+// Delete user
+router.delete("/delete/:id", verifyToken, deleteUser);
 
 // Upload profile image
 router.post("/uploadProfile", upload.single("profileImage"), async (req, res, next) => {
   try {
-    const userId = req.body.userId; // pass userId from frontend
+    const userId = req.body.userId; // frontend sends userId
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -40,7 +43,7 @@ router.get("/:userId/profileImage", async (req, res, next) => {
   }
 });
 
-// Get full user (no password)
+// Get full user (without password)
 router.get("/:id", async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
@@ -53,7 +56,11 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// Update user (POST method, with optional avatar)
+// Update user (with optional avatar)
 router.post("/update/:id", verifyToken, upload.single("avatar"), updateUser);
+
+// Get listings for a user
+router.get('/listings/:id', verifyToken, listingController.getUserListings);
+
 
 export default router;

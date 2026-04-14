@@ -73,8 +73,19 @@ async function startServer() {
 
     console.log("✅ Connected to MongoDB");
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
+    });
+
+    server.on("error", (error) => {
+      if (error.code === "EADDRINUSE") {
+        console.warn(`⚠️ Port ${PORT} is busy, trying ${Number(PORT) + 1}...`);
+        app.listen(Number(PORT) + 1, () => {
+          console.log(`🚀 Server running on fallback port ${Number(PORT) + 1}`);
+        });
+      } else {
+        console.error("❌ Server error:", error);
+      }
     });
   } catch (error) {
     console.error("❌ Failed to connect to MongoDB:", error);

@@ -4,7 +4,13 @@ import path from "path";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = "api/uploads/profile/";
+    let uploadPath = "api/uploads/";
+    if (file.fieldname === "avatar" || file.fieldname === "profileImage") {
+      uploadPath += "profile/";
+    } else {
+      uploadPath += "listings/";
+    }
+    
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }

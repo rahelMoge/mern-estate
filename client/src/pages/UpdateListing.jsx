@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-export default function CreateListing() {
+export default function UpdateListing() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const params = useParams();
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     imageUrls: [],
@@ -24,6 +25,42 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetchingListing, setFetchingListing] = useState(true);
+
+  // Fetch existing listing data on mount
+  useEffect(() => {
+    const fetchListing = async () => {
+      try {
+        const listingId = params.listingId;
+        const res = await fetch(`/api/listing/get/${listingId}`);
+        const data = await res.json();
+        if (data.success === false) {
+          console.log(data.message);
+          setFetchingListing(false);
+          return;
+        }
+        setFormData({
+          imageUrls: data.imageUrls || [],
+          name: data.name || '',
+          description: data.description || '',
+          address: data.address || '',
+          type: data.type || 'rent',
+          bedrooms: data.bedrooms || 1,
+          bathrooms: data.bathrooms || 1,
+          regularPrice: data.regularPrice || 50,
+          discountPrice: data.discountPrice || 50,
+          offer: data.offer || false,
+          parking: data.parking || false,
+          furnished: data.furnished || false,
+        });
+        setFetchingListing(false);
+      } catch (error) {
+        console.error(error);
+        setFetchingListing(false);
+      }
+    };
+    fetchListing();
+  }, [params.listingId]);
 
   // Upload images
   const handleImageSubmit = async () => {
@@ -96,7 +133,7 @@ export default function CreateListing() {
     }
   };
 
-  // Submit listing
+  // Submit updated listing
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -111,7 +148,6 @@ export default function CreateListing() {
       setLoading(true);
       setError(false);
 
-      // Build payload
       const bodyData = {
         ...formData,
         userRef: currentUser._id,
@@ -125,9 +161,7 @@ export default function CreateListing() {
         ),
       };
 
-      console.log('Submitting:', bodyData);
-
-      const res = await fetch('/api/listing/create', {
+      const res = await fetch(`/api/listing/update/${params.listingId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +174,7 @@ export default function CreateListing() {
       setLoading(false);
 
       if (!res.ok || data.success === false) {
-        setError(data.message || 'Failed to create listing');
+        setError(data.message || 'Failed to update listing');
         return;
       }
 
@@ -152,9 +186,17 @@ export default function CreateListing() {
     }
   };
 
+  if (fetchingListing) {
+    return (
+      <main className="p-3 max-w-4xl mx-auto">
+        <h1 className="text-3xl font-semibold text-center my-7">Loading listing...</h1>
+      </main>
+    );
+  }
+
   return (
     <main className="p-3 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-semibold text-center my-7">Create a Listing</h1>
+      <h1 className="text-3xl font-semibold text-center my-7">Update Listing</h1>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
         {/* Left side inputs */}
         <div className="flex flex-col gap-4 flex-1">
@@ -272,19 +314,24 @@ export default function CreateListing() {
           </div>
           <p className="text-red-700 text-sm">{imageUploadError && imageUploadError}</p>
 
-          {/* Preview images */}
+          {/* Preview images - vertical column */}
           {formData.imageUrls.length > 0 && (
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mt-2">
+            <div className="flex flex-col gap-3 mt-2">
               {formData.imageUrls.map((url, index) => (
                 <div key={index} className="relative group border rounded-lg overflow-hidden">
-                  <img src={url} alt={`listing ${index}`} className="w-full h-32 object-cover" />
+                  <img src={url} alt={`listing ${index}`} className="w-full h-48 object-cover" />
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(index)}
-                    className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition"
+                    className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                   >
-                    X
+                    Remove
                   </button>
+                  {index === 0 && (
+                    <span className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">
+                      Cover
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -294,7 +341,7 @@ export default function CreateListing() {
             disabled={loading || uploading}
             className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
-            {loading ? 'Creating...' : 'Create listing'}
+            {loading ? 'Updating...' : 'Update listing'}
           </button>
           {error && <p className="text-red-700 text-sm">{error}</p>}
         </div>
