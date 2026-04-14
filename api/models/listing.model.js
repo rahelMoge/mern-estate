@@ -56,12 +56,8 @@ const listingSchema = new mongoose.Schema(
             required: true,
         },
 
-        timestamp: {
-            type: Date,
-            default: Date.now,
-        },
-
-    }
+    },
+    { timestamps: true }
 )
 
 const Listing = mongoose.model("Listing", listingSchema);

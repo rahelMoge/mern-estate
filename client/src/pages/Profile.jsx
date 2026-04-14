@@ -15,7 +15,7 @@ export default function Profile() {
   const fileRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  
+
 
   const [file, setFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(
@@ -24,7 +24,7 @@ export default function Profile() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [showListings, setShowListings] = useState(false);
   const [userListings, setUserListings] = useState([]);
-  const [showListingsError, setShowingsError] = useState(false);  
+  const [showListingsError, setShowingsError] = useState(false);
   const [formData, setFormData] = useState({
     username: currentUser?.username || "",
     email: currentUser?.email || "",
@@ -55,6 +55,27 @@ export default function Profile() {
       }
     };
   }, [avatarPreview]);
+
+  const handleShowListings = async () => {
+    try {
+      const res = await fetch(`/api/user/listings/${currentUser._id}`, {
+        headers: { "Cache-Control": "no-cache" },
+      });
+
+      const data = await res.json();
+
+      if (data.success === false) {
+        setShowingsError(true);
+        return;
+      }
+
+      setUserListings(data.listings);
+      setShowListings(true);
+    } catch (error) {
+      console.error(error);
+      setShowingsError(true);
+    }
+  };
 
   // Auto-fetch listings on page load so they persist on refresh
   useEffect(() => {
@@ -159,26 +180,7 @@ export default function Profile() {
     }
   };
 
-  const handleShowListings = async () => {
-  try {
-    const res = await fetch(`/api/user/listings/${currentUser._id}`, {
-  headers: { "Cache-Control": "no-cache" },
-});
 
-    const data = await res.json();
-
-    if (data.success === false) {
-      setShowingsError(true);
-      return;
-    }
-
-    setUserListings(data.listings);
-    setShowListings(true);
-  } catch (error) {
-    console.error(error);
-    setShowingsError(true);
-  }
-};
 
   const handleListingDelete = async (listingId) => {
     try {
@@ -337,23 +339,22 @@ export default function Profile() {
                       {listing.name}
                     </Link>
                     <span className="text-xs text-gray-400 whitespace-nowrap mt-1">
-                      📅{" "}
                       {listing.createdAt
                         ? new Date(listing.createdAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            }
-                          )
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          }
+                        )
                         : "N/A"}
                     </span>
                   </div>
 
                   {/* Address */}
                   <p className="text-sm text-gray-500 flex items-center gap-1">
-                    📍 {listing.address}
+                    {listing.address}
                   </p>
 
                   {/* Description */}
@@ -366,22 +367,22 @@ export default function Profile() {
                   {/* Details Badges */}
                   <div className="flex flex-wrap gap-2 mt-1">
                     <span className="bg-slate-100 text-slate-700 text-xs font-semibold px-2 py-1 rounded-full">
-                      🛏 {listing.bedrooms} Beds
+                      {listing.bedrooms} Beds
                     </span>
                     <span className="bg-slate-100 text-slate-700 text-xs font-semibold px-2 py-1 rounded-full">
-                      🚿 {listing.bathrooms} Baths
+                      {listing.bathrooms} Baths
                     </span>
                     <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded-full uppercase">
                       {listing.type}
                     </span>
                     {listing.parking && (
                       <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
-                        🚗 Parking
+                        Parking
                       </span>
                     )}
                     {listing.furnished && (
                       <span className="bg-yellow-100 text-yellow-700 text-xs font-semibold px-2 py-1 rounded-full">
-                        🛋 Furnished
+                        Furnished
                       </span>
                     )}
                   </div>
@@ -419,14 +420,14 @@ export default function Profile() {
                       className="flex-1"
                     >
                       <button className="w-full text-sm font-semibold text-green-700 border border-green-600 rounded-lg py-2 hover:bg-green-50 transition-colors uppercase">
-                        ✏️ Edit
+                        Edit
                       </button>
                     </Link>
                     <button
                       onClick={() => handleListingDelete(listing._id)}
                       className="flex-1 text-sm font-semibold text-red-600 border border-red-500 rounded-lg py-2 hover:bg-red-50 transition-colors uppercase"
                     >
-                      🗑 Delete
+                      Delete
                     </button>
                   </div>
                 </div>

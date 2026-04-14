@@ -23,7 +23,7 @@ export const upload = multer({ storage });
 export const createListing = async (req, res, next) => {
     try {
         let imageUrls = req.body.imageUrls;
-        
+
         // Handle images sent via multer
         if (req.files && req.files.length > 0) {
             const uploadedUrls = req.files.map(file => {
@@ -32,7 +32,7 @@ export const createListing = async (req, res, next) => {
             // If imageUrls is a string (single URL), convert to array
             if (typeof imageUrls === 'string') imageUrls = [imageUrls];
             if (!Array.isArray(imageUrls)) imageUrls = [];
-            
+
             imageUrls = [...imageUrls, ...uploadedUrls];
         }
 
@@ -93,7 +93,7 @@ export const updateListing = async (req, res, next) => {
             });
             if (typeof imageUrls === 'string') imageUrls = [imageUrls];
             if (!Array.isArray(imageUrls)) imageUrls = [];
-            
+
             imageUrls = [...imageUrls, ...uploadedUrls];
         }
 
