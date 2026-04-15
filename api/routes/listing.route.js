@@ -2,6 +2,7 @@ import express from "express";
 import listingController from "../controllers/listing.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
 
+
 const router = express.Router();
 
 // Create a new listing (supports up to 6 images via imageUrls field)
