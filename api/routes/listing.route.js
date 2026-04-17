@@ -1,5 +1,5 @@
 import express from "express";
-import listingController from "../controllers/listing.controller.js";
+import listingController, { getListing, getUserListings, getListings } from "../controllers/listing.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
 
 
@@ -19,5 +19,6 @@ router.delete("/delete/:id", verifyToken, listingController.deleteListing);
 
 // Get listings for a user
 router.get("/user/:id", verifyToken, listingController.getUserListings);
+router.get("/get", getListings)
 
 export default router;

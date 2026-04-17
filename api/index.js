@@ -36,6 +36,7 @@ app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
 app.use("/api/message", messageRouter);
+app.use("/api/listing", listingRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

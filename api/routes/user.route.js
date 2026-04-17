@@ -1,6 +1,7 @@
 import express from "express";
 import { upload } from "../utils/multer.js";
 import User from "../models/user.model.js";
+import { getUserListings, getUser } from "../controllers/user.controller.js";
 import { deleteUser, test, updateUser } from "../controllers/user.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
 import listingController from "../controllers/listing.controller.js"; // default export
@@ -60,7 +61,8 @@ router.get("/:id", async (req, res, next) => {
 router.post("/update/:id", verifyToken, upload.single("avatar"), updateUser);
 
 // Get listings for a user
-router.get('/listings/:id', verifyToken, listingController.getUserListings);
+router.get('/listings/:id', verifyToken, getUserListings);
 
 
+router.get("/:id", verifyToken, getUser);
 export default router;
