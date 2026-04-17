@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
 import { useSelector } from 'react-redux';
@@ -147,10 +147,21 @@ export default function Listing() {
                                 {listing.furnished ? 'Furnished' : 'Unfurnished'}
                             </li>
                         </ul>
-                        {currentUser && listing.userRef !== currentUser._id && !contact && (
+                        {/* Not logged in: show sign-in prompt */}
+                        {!currentUser && (
+                            <Link
+                                to='/sign-in'
+                                className='block bg-slate-700 text-white text-center rounded-lg uppercase hover:opacity-95 p-4 transition-all shadow-lg text-lg font-bold'
+                            >
+                                Sign in to contact landlord
+                            </Link>
+                        )}
+
+                        {/* Logged in: show contact button */}
+                        {currentUser && !contact && (
                             <button
                                 onClick={() => setContact(true)}
-                                className='bg-slate-700 text-white rounded-xl uppercase hover:opacity-95 p-4 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg text-lg font-bold'
+                                className='w-full bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-4 transition-all duration-300 shadow-lg text-lg font-bold'
                             >
                                 Contact landlord
                             </button>

@@ -18,6 +18,7 @@ import uploadRouter from "./routes/upload.route.js";
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
 import listingRouter from "./routes/listing.route.js";
+import messageRouter from "./routes/message.route.js";
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use("/api/upload", uploadRouter);
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
+app.use("/api/message", messageRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -57,40 +59,50 @@ async function startServer() {
     process.exit(1);
   }
 
-  try {
-    await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 30000,
-      family: 4,
-    });
+  const connectWithRetry = async () => {
+    try {
+      await mongoose.connect(mongoUri, {
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 45000,
+        family: 4,
+      });
+      console.log("✅ Connected to MongoDB");
+    } catch (error) {
+      console.error("❌ Failed to connect to MongoDB:", error.message);
+      console.log("🔄 Retrying connection in 5 seconds...");
+      setTimeout(connectWithRetry, 5000);
+    }
+  };
 
-    mongoose.connection.on("error", (err) => {
-      console.error("❌ MongoDB connection error:", err);
-    });
+  mongoose.connection.on("error", (err) => {
+    console.error("❌ MongoDB connection error:", err.message);
+  });
 
-    mongoose.connection.on("disconnected", () => {
-      console.warn("⚠️ MongoDB disconnected");
-    });
+  mongoose.connection.on("disconnected", () => {
+    console.warn("⚠️ MongoDB disconnected. Attempting to reconnect...");
+    setTimeout(connectWithRetry, 3000);
+  });
 
-    console.log("✅ Connected to MongoDB");
+  mongoose.connection.on("reconnected", () => {
+    console.log("✅ MongoDB reconnected successfully");
+  });
 
-    const server = app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
+  await connectWithRetry();
 
-    server.on("error", (error) => {
-      if (error.code === "EADDRINUSE") {
-        console.warn(`⚠️ Port ${PORT} is busy, trying ${Number(PORT) + 1}...`);
-        app.listen(Number(PORT) + 1, () => {
-          console.log(`🚀 Server running on fallback port ${Number(PORT) + 1}`);
-        });
-      } else {
-        console.error("❌ Server error:", error);
-      }
-    });
-  } catch (error) {
-    console.error("❌ Failed to connect to MongoDB:", error);
-    process.exit(1);
-  }
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+
+  server.on("error", (error) => {
+    if (error.code === "EADDRINUSE") {
+      console.warn(`⚠️ Port ${PORT} is busy, trying ${Number(PORT) + 1}...`);
+      app.listen(Number(PORT) + 1, () => {
+        console.log(`🚀 Server running on fallback port ${Number(PORT) + 1}`);
+      });
+    } else {
+      console.error("❌ Server error:", error);
+    }
+  });
 }
 
 startServer();
