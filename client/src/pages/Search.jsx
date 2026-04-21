@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import ListingItem from '../components/ListingItem';
 
 export default function Search() {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ export default function Search() {
       setListings(data);
       setLoading(false);
     }
-    
+
     fetchListings();
   }, [location.search])
 
@@ -199,20 +200,7 @@ export default function Search() {
           {!loading &&
             listings &&
             listings.map((listing) => (
-              <div key={listing._id} className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px]">
-                <img src={listing.imageUrls[0]} alt="listing cover" className="h-[320px] sm:h-[220px] w-full object-cover hover:scale-105 transition-scale duration-300" />
-                <div className="p-3 flex flex-col gap-2 w-full">
-                  <p className="truncate text-lg font-semibold text-slate-700">{listing.name}</p>
-                  <p className="text-sm text-gray-600 line-clamp-2">{listing.description}</p>
-                  <p className="text-slate-500 mt-2 font-semibold">
-                    $
-                    {listing.offer 
-                      ? listing.discountPrice.toLocaleString('en-US') 
-                      : listing.regularPrice.toLocaleString('en-US')}
-                    {listing.type === 'rent' && ' / month'}
-                  </p>
-                </div>
-              </div>
+              <ListingItem key={listing._id} listing={listing} />
             ))}
         </div>
       </div>
