@@ -14,7 +14,7 @@ export default function Header() {
     e.preventDefault();
     const urlparams = new URLSearchParams(window.location.search);
 
-    urlparams.set('search', searchTerm);
+    urlparams.set('searchTerm', searchTerm);
     const searchQuery = urlparams.toString();
     navigate(`/search?${searchQuery}`);
   };
@@ -38,7 +38,7 @@ export default function Header() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    const searchTermFromUrl = urlParams.get('search');
+    const searchTermFromUrl = urlParams.get('searchTerm');
     if (searchTermFromUrl) {
       setSearchTerm(searchTermFromUrl);
     }
