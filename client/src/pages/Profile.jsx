@@ -124,11 +124,7 @@ export default function Profile() {
 
       // Update avatar if backend sends it
       if (responseData.avatar) {
-        setAvatarPreview(
-          responseData.avatar.startsWith("/uploads")
-            ? `http://localhost:5000${responseData.avatar}`
-            : responseData.avatar
-        );
+        setAvatarPreview(responseData.avatar);
       }
 
       // Reset password field

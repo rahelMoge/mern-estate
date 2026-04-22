@@ -29,8 +29,11 @@ export default function Header() {
       return avatar;
     }
 
-    // allow URL
+    // allow external URL
     if (avatar.startsWith('http')) return avatar;
+    
+    // allow relative uploads path
+    if (avatar.startsWith('/uploads')) return avatar;
 
     return '/default-avatar.png';
   };
