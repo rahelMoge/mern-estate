@@ -5,6 +5,7 @@ import dns from "dns";
 import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 dotenv.config();
 
@@ -19,6 +20,8 @@ import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
 import listingRouter from "./routes/listing.route.js";
 import messageRouter from "./routes/message.route.js";
+
+const __dirname = path.resolve();
 
 const app = express();
 
@@ -36,6 +39,12 @@ app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
 app.use("/api/message", messageRouter);
+
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

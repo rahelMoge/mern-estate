@@ -57,7 +57,14 @@ export default function Profile() {
   }, [avatarPreview]);
 
   const handleShowListings = async () => {
+    // Toggle off if already showing
+    if (showListings && userListings.length > 0) {
+      setShowListings(false);
+      return;
+    }
+
     try {
+      setShowingsError(false);
       const res = await fetch(`/api/user/listings/${currentUser._id}`, {
         headers: { "Cache-Control": "no-cache" },
       });
@@ -77,12 +84,7 @@ export default function Profile() {
     }
   };
 
-  // Auto-fetch listings on page load so they persist on refresh
-  useEffect(() => {
-    if (currentUser?._id) {
-      handleShowListings();
-    }
-  }, [currentUser?._id]);
+  // Removed auto-fetch to make "Show Listings" button work manually
 
   // Handle form submit
   const handleSubmit = async (e) => {
@@ -286,14 +288,14 @@ export default function Profile() {
         onClick={handleShowListings}
         className="text-green-700 w-full mt-4 font-semibold underline hover:opacity-80"
       >
-        Show Listings
+        {showListings ? "Hide Listings" : "Show Listings"}
       </button>
       <p className="text-red-700 mt-2">
         {showListingsError ? "Error showing listings" : ""}
       </p>
 
       {/* Listings Section */}
-      {userListings && userListings.length > 0 && (
+      {showListings && userListings && userListings.length > 0 && (
         <div className="mt-6">
           <h2 className="text-2xl font-semibold text-center mb-4 text-slate-700">
             Your Listings ({userListings.length})
